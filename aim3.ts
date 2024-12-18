@@ -1,13 +1,9 @@
 import { _decorator, Color, Component, Graphics, Vec2,Sprite, AudioClip,EventTouch, Vec3, v3,Node, v2,dragonBones, Camera,instantiate,Prefab, sp,Label,director,Canvas,Button} from 'cc';
-import { guanqia } from './guanqia';
+const { ccclass, property } = _decorator;
+const { CCArmatureDisplay } = dragonBones;;
 import { global } from './global';
 import { globalstarnum } from './unlock';
 import { AudioMgr } from './AudioMgr';
-
-
-const { ccclass, property } = _decorator;
-const { CCArmatureDisplay } = dragonBones;;
-
 
 @ccclass('aim')
 export class aim extends Component {
@@ -61,13 +57,12 @@ export class aim extends Component {
         @property(Node)
         mapnode: Node= null;
 
-        
         @property(Label)
         scoreLabel:Label=null;
 
         @property
         score:number=30;
-        
+
         @property
         threestar:number=30;
 
@@ -78,7 +73,7 @@ export class aim extends Component {
         onestar:number=30;
 
         @property
-        headnumber:number=2;
+        headnumber:number=3;
 
         @property(Canvas)
         canvas1: Canvas = null;
@@ -101,6 +96,8 @@ export class aim extends Component {
         @property(Node)
         nextlevel: Node= null;
 
+        @property(Button)
+        nextbutton: Button = null;
         @property(Node)
         againlevel: Node= null;
 
@@ -109,25 +106,6 @@ export class aim extends Component {
 
         @property(AudioClip)
         private clickSound_2: AudioClip = null;
-
-
-        @property(Node)
-       help1_1: Node= null;
-       @property(Node)
-       help1_2: Node= null;
-       @property(Node)
-       help1_3: Node= null;
-       @property(Node)
-       help1_4: Node= null;
-        
- 
-
-
-
-
-
-
-
 
         private fangdajing:boolean = false; //放大镜判断@@@@@@@@@@@@@
         @property(Node)
@@ -140,7 +118,7 @@ export class aim extends Component {
         private leida:boolean = false; //地雷判断!!!!!!!!!!!!!!
         @property(Node)
         leidaaim:Node = null;//地雷瞄准!!!!!!!!!!!!!!!!
-       
+
         private gezi:Vec3[] = [];
         private lastTouchTime: number = 0;  // 上一次点击的时间
         private doubleClickInterval: number = 300;  // 双击间隔 (单位：毫秒)
@@ -148,8 +126,6 @@ export class aim extends Component {
         global.currentnode = null;
         this.aim.position = new Vec3(0, 0, 0);  // 使用 position 设置位置
         this.aim.active=false;
-        
-
         director.on('fangda',this.fangda,this);//监听放大镜事件@@@@@@@@@@@@@@@@@@@
         this.fangdaaim.active = false;//放大镜瞄准初始状态@@@@@@@@@@@@@@@@
 
@@ -158,13 +134,15 @@ export class aim extends Component {
 
         director.on('leida',this.leidaevent,this);//监听雷达事件!!!!!!!!!!!!!!
         this.leidaaim.active = false;//雷达瞄准初始状态!!!!!!!!!!!!!!!!!!!!!!
-
+        console.log(this.mapnode.worldPosition);
+        
         // 监听精灵的触摸/鼠标事件
         this.canvas.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         this.canvas.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.scoreLabel.string=`${this.score}`;
-        // this.nextbutton.node.on(Button.EventType.CLICK,this.onnextbuttonClick)
-        //this.nextbutton
+        
+
+
     }
 
     update(deltaTime: number) {
@@ -173,62 +151,62 @@ export class aim extends Component {
 
     onTouchStart(event: EventTouch) {
         //放大镜@@@@@@@@@@@@@@@@@@@@@@@
-       if(this.fangdajing == true){
-        this.aim.active = false;
-        this.huojianaim.active = false;
-        this.leidaaim.active = false;
-        this.fangdaaim.active = true;
-        let pos = event.getStartLocation();
-        
-        let out = new Vec3;
-        this.camera.screenToWorld(v3(pos.x,pos.y),out);
-        if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
-           {return;} 
-        this.fangdaaim.setWorldPosition(out);
-       
-        this.fangdaaim.position=this.alignToGrid(this.fangdaaim.position)
-        return
-       }
-       //放大镜结束@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
-        //火箭^^^^^^^^^^^^^^^^^^^^^^^^^
-        if(this.huojian == true){
+        if(this.fangdajing == true){
             this.aim.active = false;
-            this.fangdaaim.active = false;
-            this.huojianaim.active = true;
-            this.leidaaim.active = false;
-            let pos = event.getStartLocation();
-            
-            let out = new Vec3;
-            this.camera.screenToWorld(v3(pos.x,pos.y),out);
-            if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
-               {return;} 
-            this.huojianaim.setWorldPosition(out);
-           
-            this.huojianaim.position=this.alignToGrid(this.huojianaim.position)
-            return
-        }
-        //火箭结束^^^^^^^^^^^^^^^^^^^^^
-
-  
-        //地雷!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if(this.leida == true){
-            this.aim.active = false;
-            this.fangdaaim.active = false;
             this.huojianaim.active = false;
-            this.leidaaim.active = true;
+            this.leidaaim.active = false;
+            this.fangdaaim.active = true;
             let pos = event.getStartLocation();
             
             let out = new Vec3;
             this.camera.screenToWorld(v3(pos.x,pos.y),out);
             if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
                {return;} 
-            this.leidaaim.setWorldPosition(out);
+            this.fangdaaim.setWorldPosition(out);
            
-            this.leidaaim.position=this.alignToGrid(this.leidaaim.position)
+            this.fangdaaim.position=this.alignToGrid(this.fangdaaim.position)
             return
-        }
+           }
+           //放大镜结束@@@@@@@@@@@@@@@@@@@@@@@@@
+    
+    
+            //火箭^^^^^^^^^^^^^^^^^^^^^^^^^
+            if(this.huojian == true){
+                this.aim.active = false;
+                this.fangdaaim.active = false;
+                this.huojianaim.active = true;
+                this.leidaaim.active = false;
+                let pos = event.getStartLocation();
+                
+                let out = new Vec3;
+                this.camera.screenToWorld(v3(pos.x,pos.y),out);
+                if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
+                   {return;} 
+                this.huojianaim.setWorldPosition(out);
+               
+                this.huojianaim.position=this.alignToGrid(this.huojianaim.position)
+                return
+            }
+            //火箭结束^^^^^^^^^^^^^^^^^^^^^
+    
+      
+            //地雷!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(this.leida == true){
+                this.aim.active = false;
+                this.fangdaaim.active = false;
+                this.huojianaim.active = false;
+                this.leidaaim.active = true;
+                let pos = event.getStartLocation();
+                
+                let out = new Vec3;
+                this.camera.screenToWorld(v3(pos.x,pos.y),out);
+                if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
+                   {return;} 
+                this.leidaaim.setWorldPosition(out);
+               
+                this.leidaaim.position=this.alignToGrid(this.leidaaim.position)
+                return
+            }
         this.aim.active = true;
         let pos = event.getStartLocation();
         
@@ -236,8 +214,9 @@ export class aim extends Component {
         this.camera.screenToWorld(v3(pos.x,pos.y),out);
         if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
            {return;} 
+        
         this.aim.setWorldPosition(out);
-       
+        
         this.aim.position=this.alignToGrid(this.aim.position)
     }
 
@@ -316,7 +295,6 @@ export class aim extends Component {
                 }
             }
             this.showeff(v3(touchLocation.x,touchLocation.y));  // 在触摸点显示效果
-            
             if(this.score<=0&&this.headnumber!=0){
                 this.canvas3.node.active = true;
                 this.againlevel.active = true;
@@ -333,7 +311,8 @@ export class aim extends Component {
         let out = new Vec3;
         this.camera.screenToWorld(v3(pos.x,pos.y),out);
         if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
-           {return;}
+           {return;} 
+        
         let angelout = this.alignToGrid(v3(out.x-this.mapnode.worldPosition.x,out.y-this.mapnode.worldPosition.y,0));
         
         if (angelout.equals(this.alignToGrid(v3(this.planehead.worldPosition.x-this.mapnode.worldPosition.x,this.planehead.worldPosition.y-this.mapnode.worldPosition.y,0)))){
@@ -342,9 +321,8 @@ export class aim extends Component {
             headnode.setWorldPosition(out);
             headnode.position=this.alignToGrid(headnode.position)
             this.updateScoreDisplay();
-            
-            // this.finishjudge();
-            AudioMgr.inst.playOneShot(this.clickSound,1);  // 在触摸点显示效果
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
             return;
         }
         if (angelout.equals(this.alignToGrid(v3(this.planehead2.worldPosition.x-this.mapnode.worldPosition.x,this.planehead2.worldPosition.y-this.mapnode.worldPosition.y,0)))){
@@ -353,9 +331,8 @@ export class aim extends Component {
             headnode.setWorldPosition(out);
             headnode.position=this.alignToGrid(headnode.position)
             this.updateScoreDisplay();
-           
             this.finishjudge();
-             AudioMgr.inst.playOneShot(this.clickSound,1);  // 在触摸点显示效果
+            AudioMgr.inst.playOneShot(this.clickSound,1);
             return;
         }
         if (angelout.equals(this.alignToGrid(v3(this.planehead3.worldPosition.x-this.mapnode.worldPosition.x,this.planehead3.worldPosition.y-this.mapnode.worldPosition.y,0)))){
@@ -364,9 +341,8 @@ export class aim extends Component {
             headnode.setWorldPosition(out);
             headnode.position=this.alignToGrid(headnode.position)
             this.updateScoreDisplay();
-           
-            this.finishjudge();
-             AudioMgr.inst.playOneShot(this.clickSound,1);  // 在触摸点显示效果
+            this.finishjudge();   
+            AudioMgr.inst.playOneShot(this.clickSound,1);
             return;
         }
         for (const element of this.planebody.children){
@@ -376,7 +352,6 @@ export class aim extends Component {
                 bodynode.setWorldPosition(out);
                 bodynode.position=this.alignToGrid(bodynode.position)
                 this.updateScoreDisplay();
-                
                 return;
             }
         }
@@ -387,7 +362,7 @@ export class aim extends Component {
                 bodynode.setWorldPosition(out);
                 bodynode.position=this.alignToGrid(bodynode.position)
                 this.updateScoreDisplay();
-        
+                
                 return;
             }
         }
@@ -398,7 +373,6 @@ export class aim extends Component {
                 bodynode.setWorldPosition(out);
                 bodynode.position=this.alignToGrid(bodynode.position)
                 this.updateScoreDisplay();
-        
                 return;
             }
         }
@@ -408,8 +382,6 @@ export class aim extends Component {
         nothingnode.position=this.alignToGrid(nothingnode.position)
         this.updateScoreDisplay();
         AudioMgr.inst.playOneShot(this.clickSound_2,1); 
-        
-        
         
     }
 
@@ -422,20 +394,17 @@ export class aim extends Component {
         return new Vec3(alignedX, alignedY, position.z);
         }
 
-   
-
-    updateScoreDisplay(){
-            if(this.scoreLabel){
-                this.score-=1;
-                this.scoreLabel.string=`${this.score}`;
-            }
+        updateScoreDisplay(){
+        if(this.scoreLabel){
+            this.score-=1;
+            this.scoreLabel.string=`${this.score}`;
         }
-
+    }
     finishjudge(){
         this.headnumber-=1;
-               
+                
             if(this.headnumber==0){
-                    global.currentnode = null;
+                global.currentnode = null;
                     // this.canvas1.node.active = false;
                     this.canvas2.node.active = true;
                     this.nextlevel.active = true;
@@ -443,35 +412,30 @@ export class aim extends Component {
                     this.canvas.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);    
                     if(this.score>=this.threestar){
                           this.star3.active=true;
-                          globalstarnum.starnum1=3;
-                         
+                          globalstarnum.starnum3=3;
                           return;
                     }
                     if(this.score>=this.twostar){
                         this.star2.active=true;
-                        if( globalstarnum.starnum1<2)
-                        globalstarnum.starnum1=2;
-              
+                        if( globalstarnum.starnum3<2)
+                        globalstarnum.starnum3=2;
                         return;
                   }
-                  
+                  if( globalstarnum.starnum3<1)
+                  globalstarnum.starnum3=1;
                     this.star1.active=true;
-                    if( globalstarnum.starnum1<1)
-                    globalstarnum.starnum1=1;
-          
                     return;
             }
     }
 
     
     onnextbuttonClick(){
-        global.canvasname = 'canvas2';
+        global.canvasname = 'canvas4';
         director.loadScene('guanqia');
     }
     againthislevel(){
         director.loadScene('guanqia');
     }
-
     fangda(){
         this.fangdajing = true;
         this.huojian = false;
@@ -579,30 +543,6 @@ export class aim extends Component {
         
         
     }
-
-     help1to2(){
-         this.help1_1.active=false;
-         this.help1_2.active=true;
-
-     }
-     help2to3(){
-        this.help1_2.active=false;
-        this.help1_3.active=true;
-
-    }
-    help3to4(){
-        this.help1_3.active=false;
-        this.help1_4.active=true;
-
-    }
-    help4tonull(){
-        this.help1_4.active=false;
-    }
-
-
-
-   
-
 }   
 
 

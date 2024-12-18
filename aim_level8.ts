@@ -1,13 +1,10 @@
-import { _decorator, Color, Component, Graphics, Vec2,Sprite, AudioClip,EventTouch, Vec3, v3,Node, v2,dragonBones, Camera,instantiate,Prefab, sp,Label,director,Canvas,Button} from 'cc';
-import { guanqia } from './guanqia';
-import { global } from './global';
-import { globalstarnum } from './unlock';
-import { AudioMgr } from './AudioMgr';
-
-
+import { _decorator, Color, Component, Graphics, Vec2,Sprite,AudioClip, EventTouch, Vec3, v3,Node, v2,dragonBones, Camera,instantiate,Prefab, sp, Label,director,Canvas} from 'cc';
 const { ccclass, property } = _decorator;
 const { CCArmatureDisplay } = dragonBones;;
-
+import { globalstarnum } from './unlock';
+import { global } from './global';
+import { global2 } from './global2';
+import { AudioMgr } from './AudioMgr';
 
 @ccclass('aim')
 export class aim extends Component {
@@ -59,15 +56,51 @@ export class aim extends Component {
         planehead3: Node= null;
 
         @property(Node)
+        planebody4: Node = null;
+
+        @property(Node)
+        planehead4: Node= null;
+
+        @property(Node)
+        planebody5: Node = null;
+
+        @property(Node)
+        planehead5: Node= null;
+        @property(Node)
+        planebody6: Node = null;
+
+        @property(Node)
+        planehead6: Node= null;
+        @property(Node)
+        mine: Node = null;
+
+        @property(Node)
+        mine2: Node = null;
+
+        @property(Node)
+        mine3: Node = null;
+
+        @property(Node)
+        mine4: Node = null;
+        @property(Node)
+        mine5: Node = null;
+
+        @property(Node)
+        mine6: Node = null;
+
+        @property(Node)
+        mine7: Node = null;
+
+
+        @property(Node)
         mapnode: Node= null;
 
-        
         @property(Label)
         scoreLabel:Label=null;
 
         @property
         score:number=30;
-        
+
         @property
         threestar:number=30;
 
@@ -78,7 +111,7 @@ export class aim extends Component {
         onestar:number=30;
 
         @property
-        headnumber:number=2;
+        headnumber:number=5;
 
         @property(Canvas)
         canvas1: Canvas = null;
@@ -109,26 +142,6 @@ export class aim extends Component {
 
         @property(AudioClip)
         private clickSound_2: AudioClip = null;
-
-
-        @property(Node)
-       help1_1: Node= null;
-       @property(Node)
-       help1_2: Node= null;
-       @property(Node)
-       help1_3: Node= null;
-       @property(Node)
-       help1_4: Node= null;
-        
- 
-
-
-
-
-
-
-
-
         private fangdajing:boolean = false; //放大镜判断@@@@@@@@@@@@@
         @property(Node)
         fangdaaim:Node = null;//放大镜瞄准@@@@@@@@@@@@@@@
@@ -140,7 +153,6 @@ export class aim extends Component {
         private leida:boolean = false; //地雷判断!!!!!!!!!!!!!!
         @property(Node)
         leidaaim:Node = null;//地雷瞄准!!!!!!!!!!!!!!!!
-       
         private gezi:Vec3[] = [];
         private lastTouchTime: number = 0;  // 上一次点击的时间
         private doubleClickInterval: number = 300;  // 双击间隔 (单位：毫秒)
@@ -148,8 +160,7 @@ export class aim extends Component {
         global.currentnode = null;
         this.aim.position = new Vec3(0, 0, 0);  // 使用 position 设置位置
         this.aim.active=false;
-        
-
+        console.log(this.mapnode.worldPosition);
         director.on('fangda',this.fangda,this);//监听放大镜事件@@@@@@@@@@@@@@@@@@@
         this.fangdaaim.active = false;//放大镜瞄准初始状态@@@@@@@@@@@@@@@@
 
@@ -158,13 +169,12 @@ export class aim extends Component {
 
         director.on('leida',this.leidaevent,this);//监听雷达事件!!!!!!!!!!!!!!
         this.leidaaim.active = false;//雷达瞄准初始状态!!!!!!!!!!!!!!!!!!!!!!
-
         // 监听精灵的触摸/鼠标事件
         this.canvas.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         this.canvas.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.scoreLabel.string=`${this.score}`;
-        // this.nextbutton.node.on(Button.EventType.CLICK,this.onnextbuttonClick)
-        //this.nextbutton
+
+
     }
 
     update(deltaTime: number) {
@@ -173,71 +183,71 @@ export class aim extends Component {
 
     onTouchStart(event: EventTouch) {
         //放大镜@@@@@@@@@@@@@@@@@@@@@@@
-       if(this.fangdajing == true){
-        this.aim.active = false;
-        this.huojianaim.active = false;
-        this.leidaaim.active = false;
-        this.fangdaaim.active = true;
-        let pos = event.getStartLocation();
-        
-        let out = new Vec3;
-        this.camera.screenToWorld(v3(pos.x,pos.y),out);
-        if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
-           {return;} 
-        this.fangdaaim.setWorldPosition(out);
-       
-        this.fangdaaim.position=this.alignToGrid(this.fangdaaim.position)
-        return
-       }
-       //放大镜结束@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
-        //火箭^^^^^^^^^^^^^^^^^^^^^^^^^
-        if(this.huojian == true){
+        if(this.fangdajing == true){
             this.aim.active = false;
-            this.fangdaaim.active = false;
-            this.huojianaim.active = true;
-            this.leidaaim.active = false;
-            let pos = event.getStartLocation();
-            
-            let out = new Vec3;
-            this.camera.screenToWorld(v3(pos.x,pos.y),out);
-            if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
-               {return;} 
-            this.huojianaim.setWorldPosition(out);
-           
-            this.huojianaim.position=this.alignToGrid(this.huojianaim.position)
-            return
-        }
-        //火箭结束^^^^^^^^^^^^^^^^^^^^^
-
-  
-        //地雷!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if(this.leida == true){
-            this.aim.active = false;
-            this.fangdaaim.active = false;
             this.huojianaim.active = false;
-            this.leidaaim.active = true;
+            this.leidaaim.active = false;
+            this.fangdaaim.active = true;
             let pos = event.getStartLocation();
             
             let out = new Vec3;
             this.camera.screenToWorld(v3(pos.x,pos.y),out);
             if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
                {return;} 
-            this.leidaaim.setWorldPosition(out);
+            this.fangdaaim.setWorldPosition(out);
            
-            this.leidaaim.position=this.alignToGrid(this.leidaaim.position)
+            this.fangdaaim.position=this.alignToGrid(this.fangdaaim.position)
             return
-        }
+           }
+           //放大镜结束@@@@@@@@@@@@@@@@@@@@@@@@@
+    
+    
+            //火箭^^^^^^^^^^^^^^^^^^^^^^^^^
+            if(this.huojian == true){
+                this.aim.active = false;
+                this.fangdaaim.active = false;
+                this.huojianaim.active = true;
+                this.leidaaim.active = false;
+                let pos = event.getStartLocation();
+                
+                let out = new Vec3;
+                this.camera.screenToWorld(v3(pos.x,pos.y),out);
+                if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
+                   {return;} 
+                this.huojianaim.setWorldPosition(out);
+               
+                this.huojianaim.position=this.alignToGrid(this.huojianaim.position)
+                return
+            }
+            //火箭结束^^^^^^^^^^^^^^^^^^^^^
+    
+      
+            //地雷!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(this.leida == true){
+                this.aim.active = false;
+                this.fangdaaim.active = false;
+                this.huojianaim.active = false;
+                this.leidaaim.active = true;
+                let pos = event.getStartLocation();
+                
+                let out = new Vec3;
+                this.camera.screenToWorld(v3(pos.x,pos.y),out);
+                if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
+                   {return;} 
+                this.leidaaim.setWorldPosition(out);
+               
+                this.leidaaim.position=this.alignToGrid(this.leidaaim.position)
+                return
+            }
         this.aim.active = true;
         let pos = event.getStartLocation();
         
         let out = new Vec3;
         this.camera.screenToWorld(v3(pos.x,pos.y),out);
         if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
-           {return;} 
+           {return;}
         this.aim.setWorldPosition(out);
-       
+        
         this.aim.position=this.alignToGrid(this.aim.position)
     }
 
@@ -245,7 +255,7 @@ export class aim extends Component {
         const now = Date.now();  // 获取当前时间
         if (now - this.lastTouchTime <= this.doubleClickInterval) {
             // 判断是否为双击
-            
+          
             const touchLocation = event.getLocation();  // 获取触摸位置
             let out = new Vec3;
             this.camera.screenToWorld(v3(touchLocation.x,touchLocation.y),out);
@@ -260,7 +270,7 @@ export class aim extends Component {
             if(this.fangdajing == true){
                
                 this.huojianshoweff(v3(touchLocation.x,touchLocation.y));
-                this.score +=2;
+                
                 this.scoreLabel.string=`${this.score}`;
                 this.fangdajing = false;
                 this.fangdaaim.active = false;
@@ -277,7 +287,7 @@ export class aim extends Component {
             if(this.huojian == true){
                 for( let i=-30;i<31;i++){
                 this.huojianshoweff(v3(touchLocation.x,touchLocation.y+i*this.cellside/3));
-                this.score +=1;
+                
                 this.scoreLabel.string=`${this.score}`;
             }
                 this.score +=1;
@@ -297,12 +307,12 @@ export class aim extends Component {
             if(this.leida == true){
                 for( let i=-1;i<2;i++){
                 this.huojianshoweff(v3(touchLocation.x,touchLocation.y+i*50));
-                this.score +=1;
+                
                 this.scoreLabel.string=`${this.score}`;
             }
             for( let i=-1;i<2;i++){
                 this.huojianshoweff(v3(touchLocation.x+i*50,touchLocation.y));
-                this.score +=1;
+                
                 this.scoreLabel.string=`${this.score}`;
             }
                 this.score +=1;
@@ -316,11 +326,12 @@ export class aim extends Component {
                 }
             }
             this.showeff(v3(touchLocation.x,touchLocation.y));  // 在触摸点显示效果
-            
+            this.updateScoreDisplay();
             if(this.score<=0&&this.headnumber!=0){
+                global.currentnode = null;
                 this.canvas3.node.active = true;
                 this.againlevel.active = true;
-                global.currentnode = null;
+                this.scoreLabel.string=`0`;
                 return;
             }
             
@@ -333,7 +344,8 @@ export class aim extends Component {
         let out = new Vec3;
         this.camera.screenToWorld(v3(pos.x,pos.y),out);
         if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
-           {return;}
+           {this.score+=1;
+            return;}
         let angelout = this.alignToGrid(v3(out.x-this.mapnode.worldPosition.x,out.y-this.mapnode.worldPosition.y,0));
         
         if (angelout.equals(this.alignToGrid(v3(this.planehead.worldPosition.x-this.mapnode.worldPosition.x,this.planehead.worldPosition.y-this.mapnode.worldPosition.y,0)))){
@@ -341,10 +353,8 @@ export class aim extends Component {
             this.canvas.addChild(headnode);
             headnode.setWorldPosition(out);
             headnode.position=this.alignToGrid(headnode.position)
-            this.updateScoreDisplay();
-            
-            // this.finishjudge();
-            AudioMgr.inst.playOneShot(this.clickSound,1);  // 在触摸点显示效果
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
             return;
         }
         if (angelout.equals(this.alignToGrid(v3(this.planehead2.worldPosition.x-this.mapnode.worldPosition.x,this.planehead2.worldPosition.y-this.mapnode.worldPosition.y,0)))){
@@ -352,10 +362,8 @@ export class aim extends Component {
             this.canvas.addChild(headnode);
             headnode.setWorldPosition(out);
             headnode.position=this.alignToGrid(headnode.position)
-            this.updateScoreDisplay();
-           
             this.finishjudge();
-             AudioMgr.inst.playOneShot(this.clickSound,1);  // 在触摸点显示效果
+            AudioMgr.inst.playOneShot(this.clickSound,1);
             return;
         }
         if (angelout.equals(this.alignToGrid(v3(this.planehead3.worldPosition.x-this.mapnode.worldPosition.x,this.planehead3.worldPosition.y-this.mapnode.worldPosition.y,0)))){
@@ -363,10 +371,35 @@ export class aim extends Component {
             this.canvas.addChild(headnode);
             headnode.setWorldPosition(out);
             headnode.position=this.alignToGrid(headnode.position)
-            this.updateScoreDisplay();
-           
             this.finishjudge();
-             AudioMgr.inst.playOneShot(this.clickSound,1);  // 在触摸点显示效果
+            AudioMgr.inst.playOneShot(this.clickSound,1);
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.planehead4.worldPosition.x-this.mapnode.worldPosition.x,this.planehead4.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            const headnode = instantiate(this.explosion);
+            this.canvas.addChild(headnode);
+            headnode.setWorldPosition(out);
+            headnode.position=this.alignToGrid(headnode.position)
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.planehead5.worldPosition.x-this.mapnode.worldPosition.x,this.planehead5.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            const headnode = instantiate(this.explosion);
+            this.canvas.addChild(headnode);
+            headnode.setWorldPosition(out);
+            headnode.position=this.alignToGrid(headnode.position)
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.planehead6.worldPosition.x-this.mapnode.worldPosition.x,this.planehead6.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            const headnode = instantiate(this.explosion);
+            this.canvas.addChild(headnode);
+            headnode.setWorldPosition(out);
+            headnode.position=this.alignToGrid(headnode.position)
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
             return;
         }
         for (const element of this.planebody.children){
@@ -375,8 +408,6 @@ export class aim extends Component {
                 this.canvas.addChild(bodynode);
                 bodynode.setWorldPosition(out);
                 bodynode.position=this.alignToGrid(bodynode.position)
-                this.updateScoreDisplay();
-                
                 return;
             }
         }
@@ -386,8 +417,6 @@ export class aim extends Component {
                 this.canvas.addChild(bodynode);
                 bodynode.setWorldPosition(out);
                 bodynode.position=this.alignToGrid(bodynode.position)
-                this.updateScoreDisplay();
-        
                 return;
             }
         }
@@ -397,20 +426,76 @@ export class aim extends Component {
                 this.canvas.addChild(bodynode);
                 bodynode.setWorldPosition(out);
                 bodynode.position=this.alignToGrid(bodynode.position)
-                this.updateScoreDisplay();
-        
                 return;
             }
+        }
+        for (const element of this.planebody4.children){
+            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+                const bodynode = instantiate(this.hit);
+                this.canvas.addChild(bodynode);
+                bodynode.setWorldPosition(out);
+                bodynode.position=this.alignToGrid(bodynode.position)
+                return;
+            }
+        }
+        for (const element of this.planebody5.children){
+            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+                const bodynode = instantiate(this.hit);
+                this.canvas.addChild(bodynode);
+                bodynode.setWorldPosition(out);
+                bodynode.position=this.alignToGrid(bodynode.position)
+                return;
+            }
+        }
+        for (const element of this.planebody6.children){
+            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+                const bodynode = instantiate(this.hit);
+                this.canvas.addChild(bodynode);
+                bodynode.setWorldPosition(out);
+                bodynode.position=this.alignToGrid(bodynode.position)
+                return;
+            }
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine.worldPosition.x-this.mapnode.worldPosition.x,this.mine.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine2.worldPosition.x-this.mapnode.worldPosition.x,this.mine2.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine2.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine3.worldPosition.x-this.mapnode.worldPosition.x,this.mine3.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine3.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine4.worldPosition.x-this.mapnode.worldPosition.x,this.mine4.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine4.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine5.worldPosition.x-this.mapnode.worldPosition.x,this.mine5.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine5.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine6.worldPosition.x-this.mapnode.worldPosition.x,this.mine6.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine6.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine7.worldPosition.x-this.mapnode.worldPosition.x,this.mine7.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine7.active=true;
+            return;
         }
         const nothingnode = instantiate(this.nothing);
         this.canvas.addChild(nothingnode);
         nothingnode.setWorldPosition(out);
         nothingnode.position=this.alignToGrid(nothingnode.position)
-        this.updateScoreDisplay();
         AudioMgr.inst.playOneShot(this.clickSound_2,1); 
-        
-        
-        
     }
 
  
@@ -422,20 +507,21 @@ export class aim extends Component {
         return new Vec3(alignedX, alignedY, position.z);
         }
 
-   
-
     updateScoreDisplay(){
-            if(this.scoreLabel){
-                this.score-=1;
-                this.scoreLabel.string=`${this.score}`;
-            }
+        if(this.scoreLabel){
+            this.score-=1;
+            this.scoreLabel.string=`${this.score}`;
         }
-
+    }
+    onnextbuttonClick(){
+        global2.canvasname2 = 'canvas9';
+        director.loadScene('guanqia2');
+    }
     finishjudge(){
         this.headnumber-=1;
-               
+                
             if(this.headnumber==0){
-                    global.currentnode = null;
+                global.currentnode = null;
                     // this.canvas1.node.active = false;
                     this.canvas2.node.active = true;
                     this.nextlevel.active = true;
@@ -443,35 +529,189 @@ export class aim extends Component {
                     this.canvas.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);    
                     if(this.score>=this.threestar){
                           this.star3.active=true;
-                          globalstarnum.starnum1=3;
-                         
+                          globalstarnum.starnum8=3;
                           return;
                     }
                     if(this.score>=this.twostar){
                         this.star2.active=true;
-                        if( globalstarnum.starnum1<2)
-                        globalstarnum.starnum1=2;
-              
+                        if( globalstarnum.starnum8<2)
+                        globalstarnum.starnum8=2;
                         return;
                   }
-                  
+                  if( globalstarnum.starnum8<1)
+                  globalstarnum.starnum8=1;
                     this.star1.active=true;
-                    if( globalstarnum.starnum1<1)
-                    globalstarnum.starnum1=1;
-          
                     return;
             }
     }
-
-    
-    onnextbuttonClick(){
-        global.canvasname = 'canvas2';
-        director.loadScene('guanqia');
-    }
     againthislevel(){
-        director.loadScene('guanqia');
+        director.loadScene('guanqia2');
     }
+    private huojianshoweff(pos: Vec3) {    
+        this.aim.active = false;
+        let out = new Vec3;
+        this.camera.screenToWorld(v3(pos.x,pos.y),out);
+        if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
+          {
+            return;} 
+        let angelout = this.alignToGrid(v3(out.x-this.mapnode.worldPosition.x,out.y-this.mapnode.worldPosition.y,0));
+        for (let i =0;i<this.gezi.length;i++){
+            if (angelout.equals(this.gezi[i])){
+          
+          return;}
 
+            }
+        this.gezi.push(angelout);
+        
+        if (angelout.equals(this.alignToGrid(v3(this.planehead.worldPosition.x-this.mapnode.worldPosition.x,this.planehead.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            const headnode = instantiate(this.explosion);
+            this.canvas.addChild(headnode);
+            headnode.setWorldPosition(out);
+            headnode.position=this.alignToGrid(headnode.position)
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.planehead2.worldPosition.x-this.mapnode.worldPosition.x,this.planehead2.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            const headnode = instantiate(this.explosion);
+            this.canvas.addChild(headnode);
+            headnode.setWorldPosition(out);
+            headnode.position=this.alignToGrid(headnode.position)
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.planehead3.worldPosition.x-this.mapnode.worldPosition.x,this.planehead3.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            const headnode = instantiate(this.explosion);
+            this.canvas.addChild(headnode);
+            headnode.setWorldPosition(out);
+            headnode.position=this.alignToGrid(headnode.position)
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.planehead4.worldPosition.x-this.mapnode.worldPosition.x,this.planehead4.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            const headnode = instantiate(this.explosion);
+            this.canvas.addChild(headnode);
+            headnode.setWorldPosition(out);
+            headnode.position=this.alignToGrid(headnode.position)
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.planehead5.worldPosition.x-this.mapnode.worldPosition.x,this.planehead5.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            const headnode = instantiate(this.explosion);
+            this.canvas.addChild(headnode);
+            headnode.setWorldPosition(out);
+            headnode.position=this.alignToGrid(headnode.position)
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.planehead6.worldPosition.x-this.mapnode.worldPosition.x,this.planehead6.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            const headnode = instantiate(this.explosion);
+            this.canvas.addChild(headnode);
+            headnode.setWorldPosition(out);
+            headnode.position=this.alignToGrid(headnode.position)
+            this.finishjudge();
+            AudioMgr.inst.playOneShot(this.clickSound,1);
+            return;
+        }
+        for (const element of this.planebody.children){
+            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+                const bodynode = instantiate(this.hit);
+                this.canvas.addChild(bodynode);
+                bodynode.setWorldPosition(out);
+                bodynode.position=this.alignToGrid(bodynode.position)
+                return;
+            }
+        }
+        for (const element of this.planebody2.children){
+            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+                const bodynode = instantiate(this.hit);
+                this.canvas.addChild(bodynode);
+                bodynode.setWorldPosition(out);
+                bodynode.position=this.alignToGrid(bodynode.position)
+                return;
+            }
+        }
+        for (const element of this.planebody3.children){
+            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+                const bodynode = instantiate(this.hit);
+                this.canvas.addChild(bodynode);
+                bodynode.setWorldPosition(out);
+                bodynode.position=this.alignToGrid(bodynode.position)
+                return;
+            }
+        }
+        for (const element of this.planebody4.children){
+            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+                const bodynode = instantiate(this.hit);
+                this.canvas.addChild(bodynode);
+                bodynode.setWorldPosition(out);
+                bodynode.position=this.alignToGrid(bodynode.position)
+                return;
+            }
+        }
+        for (const element of this.planebody5.children){
+            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+                const bodynode = instantiate(this.hit);
+                this.canvas.addChild(bodynode);
+                bodynode.setWorldPosition(out);
+                bodynode.position=this.alignToGrid(bodynode.position)
+                return;
+            }
+        }
+        for (const element of this.planebody6.children){
+            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+                const bodynode = instantiate(this.hit);
+                this.canvas.addChild(bodynode);
+                bodynode.setWorldPosition(out);
+                bodynode.position=this.alignToGrid(bodynode.position)
+                return;
+            }
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine.worldPosition.x-this.mapnode.worldPosition.x,this.mine.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine2.worldPosition.x-this.mapnode.worldPosition.x,this.mine2.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine2.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine3.worldPosition.x-this.mapnode.worldPosition.x,this.mine3.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine3.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine4.worldPosition.x-this.mapnode.worldPosition.x,this.mine4.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine4.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine5.worldPosition.x-this.mapnode.worldPosition.x,this.mine5.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine5.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine6.worldPosition.x-this.mapnode.worldPosition.x,this.mine6.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine6.active=true;
+            return;
+        }
+        if (angelout.equals(this.alignToGrid(v3(this.mine7.worldPosition.x-this.mapnode.worldPosition.x,this.mine7.worldPosition.y-this.mapnode.worldPosition.y,0)))){
+            this.score-=4;
+            this.mine7.active=true;
+            return;
+        }
+        const nothingnode = instantiate(this.nothing);
+        this.canvas.addChild(nothingnode);
+        nothingnode.setWorldPosition(out);
+        nothingnode.position=this.alignToGrid(nothingnode.position)
+        AudioMgr.inst.playOneShot(this.clickSound_2,1); 
+    }
     fangda(){
         this.fangdajing = true;
         this.huojian = false;
@@ -489,120 +729,5 @@ export class aim extends Component {
         this.fangdajing = false;
         this.huojian = false;
     }
-
-    private huojianshoweff(pos: Vec3) {    
-        this.aim.active = false;
-        let out = new Vec3;
-        this.camera.screenToWorld(v3(pos.x,pos.y),out);
-        if (out.x <= this.mapnode.worldPosition.x-this.rows*this.cellside/2 || out.x >= this.mapnode.worldPosition.x+this.rows*this.cellside/2 || out.y <= this.mapnode.worldPosition.y-this.cols*this.cellside/2 || out.y >= this.mapnode.worldPosition.y+this.cols*this.cellside/2)
-           {this.updateScoreDisplay();
-            return;}
-        let angelout = this.alignToGrid(v3(out.x-this.mapnode.worldPosition.x,out.y-this.mapnode.worldPosition.y,0));
-        for (let i =0;i<this.gezi.length;i++){
-            if (angelout.equals(this.gezi[i])){
-          this.score -=1;
-          return;}
-
-            }
-        this.gezi.push(angelout);
-        if (angelout.equals(this.alignToGrid(v3(this.planehead.worldPosition.x-this.mapnode.worldPosition.x,this.planehead.worldPosition.y-this.mapnode.worldPosition.y,0)))){
-            const headnode = instantiate(this.explosion);
-            this.canvas.addChild(headnode);
-            headnode.setWorldPosition(out);
-            headnode.position=this.alignToGrid(headnode.position)
-            this.updateScoreDisplay();
-            
-            this.finishjudge();
-            
-            return;
-        }
-        if (angelout.equals(this.alignToGrid(v3(this.planehead2.worldPosition.x-this.mapnode.worldPosition.x,this.planehead2.worldPosition.y-this.mapnode.worldPosition.y,0)))){
-            const headnode = instantiate(this.explosion);
-            this.canvas.addChild(headnode);
-            headnode.setWorldPosition(out);
-            headnode.position=this.alignToGrid(headnode.position)
-            this.updateScoreDisplay();
-            
-            this.finishjudge();
-            return;
-        }
-        if (angelout.equals(this.alignToGrid(v3(this.planehead3.worldPosition.x-this.mapnode.worldPosition.x,this.planehead3.worldPosition.y-this.mapnode.worldPosition.y,0)))){
-            const headnode = instantiate(this.explosion);
-            this.canvas.addChild(headnode);
-            headnode.setWorldPosition(out);
-            headnode.position=this.alignToGrid(headnode.position)
-            this.updateScoreDisplay();
-            
-            this.finishjudge();
-            
-            return;
-        }
-        for (const element of this.planebody.children){
-            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
-                const bodynode = instantiate(this.hit);
-                this.canvas.addChild(bodynode);
-                bodynode.setWorldPosition(out);
-                bodynode.position=this.alignToGrid(bodynode.position)
-                this.updateScoreDisplay();
-                
-                return;
-            }
-        }
-        for (const element of this.planebody2.children){
-            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
-                const bodynode = instantiate(this.hit);
-                this.canvas.addChild(bodynode);
-                bodynode.setWorldPosition(out);
-                bodynode.position=this.alignToGrid(bodynode.position)
-                this.updateScoreDisplay();
-        
-                return;
-            }
-        }
-        for (const element of this.planebody3.children){
-            if(angelout.equals(this.alignToGrid(v3(element.worldPosition.x-this.mapnode.worldPosition.x,element.worldPosition.y-this.mapnode.worldPosition.y,0)))){
-                const bodynode = instantiate(this.hit);
-                this.canvas.addChild(bodynode);
-                bodynode.setWorldPosition(out);
-                bodynode.position=this.alignToGrid(bodynode.position)
-                this.updateScoreDisplay();
-        
-                return;
-            }
-        }
-        const nothingnode = instantiate(this.nothing);
-        this.canvas.addChild(nothingnode);
-        nothingnode.setWorldPosition(out);
-        nothingnode.position=this.alignToGrid(nothingnode.position)
-        this.updateScoreDisplay();
-        
-        
-        
-    }
-
-     help1to2(){
-         this.help1_1.active=false;
-         this.help1_2.active=true;
-
-     }
-     help2to3(){
-        this.help1_2.active=false;
-        this.help1_3.active=true;
-
-    }
-    help3to4(){
-        this.help1_3.active=false;
-        this.help1_4.active=true;
-
-    }
-    help4tonull(){
-        this.help1_4.active=false;
-    }
-
-
-
-   
-
 }   
-
 
